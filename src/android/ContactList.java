@@ -18,74 +18,20 @@ import java.util.List;
 
 public class ContactList extends CordovaPlugin {
 
-    private ListView listView;
+    private FastSearchListView listView;
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("addContactList")) {
 
-            List<String> countries = new ArrayList<String>();
-
-            countries.add("Italy");
-            countries.add("Italy");
-            countries.add("Italy");
-            countries.add("Italy");
-            countries.add("Italy");
-            countries.add("Spain");
-            countries.add("France");
-            countries.add("Germany");
-            countries.add("United Kingdom");
-            countries.add("United Kingdom");
-            countries.add("United Kingdom");
-            countries.add("United Kingdom");
-            countries.add("Austria");
-            countries.add("Ireland");
-            countries.add("Portugal");
-            countries.add("Portugal");
-            countries.add("Portugal");
-            countries.add("Portugal");
-            countries.add("Belgium");
-            countries.add("Denmark");
-            countries.add("Finland");
-            countries.add("Finland");
-            countries.add("Finland");
-            countries.add("Finland");
-            countries.add("Norway");
-            countries.add("Sweden");
-            countries.add("Netherlands");
-            countries.add("Greece");
-            countries.add("Greece");
-            countries.add("Greece");
-            countries.add("Greece");
-            countries.add("Greece");
-            countries.add("Greece");
-            countries.add("Luxembourg");
-            countries.add("Malta");
-            countries.add("Malta");
-            countries.add("Malta");
-            countries.add("Malta");
-            countries.add("Malta");
-            countries.add("Malta");
-            countries.add("Latvia");
-            countries.add("Slovakia");
-            countries.add("Slovenia");
-            countries.add("Poland");
-            countries.add("Hungary");
-            countries.add("Romania");
-            countries.add("Romania");
-            countries.add("Romania");
-            countries.add("Romania");
-
-
-
-//            Collections.sort(countries);
-
             int height = args.getInt(0);
 
-            listView = new ListView(cordova.getActivity());
+            listView = new FastSearchListView(cordova.getActivity());
             listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+            listView.setFastScrollEnabled(true);
+            listView.setBackgroundResource(android.R.color.transparent);
+            listView.setCacheColorHint(android.R.color.transparent);
+            listView.setScrollingCacheEnabled(false);
 
-//            ArrayAdapter<String> sa = new ArrayAdapter<String>(cordova.getActivity(), android.R.layout.simple_list_item_1, countries);
-            //listView.setAdapter(sa);
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -104,17 +50,20 @@ public class ContactList extends CordovaPlugin {
                 }
             });
         } else if (action.equals("setContacts")) {
-            System.out.println(":::::" + args.toString());
+
             JSONArray jsonContacts = args.getJSONArray(0);
 
             int len = jsonContacts.length();
-            List<String> countries = new ArrayList<String>(len);
+            List<SimpleIndexAdapter.Contact> contacts = new ArrayList<SimpleIndexAdapter.Contact>();
 
             for (int i = 0; i < len; i++) {
-                countries.add(((JSONObject) jsonContacts.get(i)).getString("name"));
+                JSONObject object = (JSONObject) jsonContacts.get(i);
+                contacts.add(new SimpleIndexAdapter.Contact(object.getString("id"), object.getString("name"),
+                        object.getString("photo"), object.getString("data")));
             }
 
-            final ArrayAdapter<String> sa = new ArrayAdapter<String>(cordova.getActivity(), android.R.layout.simple_list_item_1, countries);
+
+            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity());
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
