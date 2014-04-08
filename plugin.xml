@@ -27,7 +27,7 @@
         <source-file src="src/android/SimpleIndexAdapter.java" target-dir="src/org/apache/cordova/contactlist" />
         <resource-file src="src/android/res/drawable/list_item_background.xml" target="res/drawable/" />
         <resource-file src="src/android/res/drawable/list_item_selector.xml" target="res/drawable/" />
-        <resource-file src="src/android/res/layout/contact_item.xml" target="res/lyaout/" />
+        <resource-file src="src/android/res/layout/contact_item.xml" target="res/layout/" />
     </platform>
           
 </plugin>
