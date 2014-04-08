@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	id="org.apache.cordova.contactlist"
+	version="1.1">
+      
+    <name>ContactList</name>
+	<description>Contact list</description>
+	<author>Qordinate</author>
+	<license>MIT</license>
+
+	<engines>
+	    <engine name="cordova" version=">=2.9" />
+	</engines>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="ContactList">
+                <param name="android-package" value="org.apache.cordova.contactlist.ContactList"/>
+            </feature>
+        </config-file>
+          
+        <source-file src="src/android/ContactList.java" target-dir="src/org/apache/cordova/contactlist" />
+     </platform>
+          
+</plugin>
