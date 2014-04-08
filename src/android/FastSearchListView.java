@@ -49,6 +49,7 @@ public class FastSearchListView extends ListView {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        try {
         super.onDraw(canvas);
 
         scaledWidth = indWidth * getSizeInPixel(ctx);
@@ -83,6 +84,9 @@ public class FastSearchListView extends ListView {
             textPaint2.setTextSize(2 * indWidth);
 
             canvas.drawText(section.toUpperCase(), getWidth() / 2, getHeight() / 2, textPaint2);
+        }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
