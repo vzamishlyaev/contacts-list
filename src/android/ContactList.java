@@ -27,7 +27,7 @@ public class ContactList extends CordovaPlugin {
 
             listView = new FastSearchListView(cordova.getActivity());
             listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-            listView.setFastScrollEnabled(true);
+            //listView.setFastScrollEnabled(true);
             listView.setBackgroundResource(android.R.color.transparent);
             listView.setCacheColorHint(android.R.color.transparent);
             listView.setScrollingCacheEnabled(false);
@@ -59,9 +59,10 @@ public class ContactList extends CordovaPlugin {
             for (int i = 0; i < len; i++) {
                 JSONObject object = (JSONObject) jsonContacts.get(i);
                 contacts.add(new SimpleIndexAdapter.Contact(object.getString("id"), object.getString("name"),
-                        object.getString("photo"), object.getString("data")));
+                        object.getString("lastName"), object.getString("photo"), object.getString("data")));
             }
 
+            Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
             final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity());
 

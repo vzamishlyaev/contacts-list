@@ -11,6 +11,7 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import com.qordinate.mobile.R;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact> implements SectionIndexer {
@@ -99,17 +100,36 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         ImageView photo;
     }
 
-    static class Contact {
+    static class Contact implements Comparable<Contact> {
         String id;
         String name;
+        String lastName;
         String photo;
         String data;
 
-        Contact(String id, String name, String photo, String data) {
+        Contact(String id, String name, String lastName, String photo, String data) {
             this.id = id;
             this.name = name;
+            this.lastName = lastName;
             this.photo = photo;
             this.data = data;
         }
+
+        public int compareTo(Contact contact) {
+            String lastName = contact.lastName;
+            return lastName.compareTo(lastName);
+        }
+
+        public static Comparator<Contact> lastNameComparator = new Comparator<Contact>() {
+
+            public int compare(Contact contact1, Contact contact2) {
+
+                String name1 = contact1.lastName.toUpperCase();
+                String name2 = contact2.lastName.toUpperCase();
+
+                return name1.compareTo(name2);
+            }
+
+        };
     }
 }
