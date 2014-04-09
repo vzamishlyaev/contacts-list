@@ -25,6 +25,7 @@
         <source-file src="src/android/ContactList.java" target-dir="src/org/apache/cordova/contactlist/" />
         <source-file src="src/android/FastSearchListView.java" target-dir="src/org/apache/cordova/contactlist/" />
         <source-file src="src/android/SimpleIndexAdapter.java" target-dir="src/org/apache/cordova/contactlist/" />
+        <source-file src="src/android/ImageLoaderManager.java" target-dir="src/org/apache/cordova/contactlist/" />
         <resource-file src="src/android/res/drawable/list_item_background.xml" target="res/drawable/list_item_background.xml" />
         <resource-file src="src/android/res/drawable/list_item_selector.xml" target="res/drawable/list_item_selector.xml" />
         <resource-file src="src/android/res/layout/contact_item.xml" target="res/layout/contact_item.xml" />

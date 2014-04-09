@@ -19,6 +19,7 @@ import java.util.List;
 public class ContactList extends CordovaPlugin {
 
     private FastSearchListView listView;
+    private ImageLoaderManager loaderManager = new ImageLoaderManager(new Handler(), cordova.getActivity());
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("addContactList")) {
@@ -49,6 +50,9 @@ public class ContactList extends CordovaPlugin {
                     getParentView().removeView(listView);
                 }
             });
+
+            callbackContext.success();
+            return true;
         } else if (action.equals("setContacts")) {
 
             JSONArray jsonContacts = args.getJSONArray(0);
@@ -58,13 +62,13 @@ public class ContactList extends CordovaPlugin {
 
             for (int i = 0; i < len; i++) {
                 JSONObject object = (JSONObject) jsonContacts.get(i);
-                contacts.add(new SimpleIndexAdapter.Contact(object.getString("id"), object.getString("name"),
+                contacts.add(new SimpleIndexAdapter.Contact(object.getInt("id"), object.getString("name"),
                         object.getString("lastName"), object.getString("photo"), object.getString("data")));
             }
 
             Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
-            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity());
+            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager);
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -73,6 +77,8 @@ public class ContactList extends CordovaPlugin {
                 }
             });
 
+            callbackContext.success();
+            return true;
         }
 
         callbackContext.error("Invalid action");

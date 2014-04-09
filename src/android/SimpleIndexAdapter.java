@@ -19,11 +19,13 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
     private List<Contact> contacts;
     private Context context;
     private static String sections = "abcdefghijklmnopqrstuvwxyz";
+    private ImageLoaderManager loaderManager;
 
-    public SimpleIndexAdapter(List<Contact> contacts, Context ctx) {
+    public SimpleIndexAdapter(List<Contact> contacts, Context ctx, ImageLoaderManager loaderManager) {
         super(ctx, R.layout.contact_item, contacts);
         this.contacts = contacts;
         this.context = ctx;
+        this.loaderManager = loaderManager;
     }
 
     public int getCount() {
@@ -61,6 +63,8 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         viewHolder.name.setText(contact.name);
         viewHolder.data.setText(contact.data);
 
+        loaderManager.loadContactPhoto(viewHolder.photo, contact);
+
         return v;
 
     }
@@ -94,6 +98,7 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         return sectionsArr;
     }
 
+
     static class ViewHolder {
         TextView name;
         TextView data;
@@ -101,13 +106,13 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
     }
 
     static class Contact implements Comparable<Contact> {
-        String id;
+        int id;
         String name;
         String lastName;
         String photo;
         String data;
 
-        Contact(String id, String name, String lastName, String photo, String data) {
+        Contact(int id, String name, String lastName, String photo, String data) {
             this.id = id;
             this.name = name;
             this.lastName = lastName;
