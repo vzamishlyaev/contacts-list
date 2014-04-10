@@ -16,21 +16,24 @@ import android.os.Handler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import android.view.View;
+import android.widget.*;
 
 public class ContactList extends CordovaPlugin {
 
     private FastSearchListView listView;
-    private ImageLoaderManager loaderManager = new ImageLoaderManager(new Handler(), cordova.getActivity());
+    private ImageLoaderManager loaderManager;
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("addContactList")) {
+
 
             int height = args.getInt(0);
 
             listView = new FastSearchListView(cordova.getActivity());
             listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
             //listView.setFastScrollEnabled(true);
-            listView.setBackgroundResource(android.R.color.transparent);
+            listView.setBackgroundResource(android.R.color.white);
             listView.setCacheColorHint(android.R.color.transparent);
             listView.setScrollingCacheEnabled(false);
 
@@ -38,17 +41,29 @@ public class ContactList extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+            		loaderManager = new ImageLoaderManager(new Handler(), cordova.getActivity());
                     getParentView().addView(listView, 1);
                 }
             });
 
             callbackContext.success();
             return true;
-        } else if (action.equals("hideContactList")) {
+        } else if (action.equals("removeContactList")) {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     getParentView().removeView(listView);
+                }
+            });
+
+            callbackContext.success();
+            return true;
+        } else if (action.equals("changeContactListVisibility")) {
+            final int visibility = args.getInt(0);
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    listView.setVisibility(visibility == 1 ? View.VISIBLE : View.GONE);
                 }
             });
 
@@ -59,7 +74,7 @@ public class ContactList extends CordovaPlugin {
             JSONArray jsonContacts = args.getJSONArray(0);
 
             int len = jsonContacts.length();
-            List<SimpleIndexAdapter.Contact> contacts = new ArrayList<SimpleIndexAdapter.Contact>();
+            final List<SimpleIndexAdapter.Contact> contacts = new ArrayList<SimpleIndexAdapter.Contact>();
 
             for (int i = 0; i < len; i++) {
                 JSONObject object = (JSONObject) jsonContacts.get(i);
@@ -70,6 +85,13 @@ public class ContactList extends CordovaPlugin {
             Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
             final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager);
+
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+					webView.loadUrl(String.format("javascript:contactListTouchCallback('%s');", contacts.get(i).id));
+				}
+			});
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
