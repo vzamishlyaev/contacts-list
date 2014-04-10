@@ -1,6 +1,7 @@
 package org.apache.cordova.contactlist;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,33 +12,51 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import com.qordinate.mobile.R;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact> implements SectionIndexer {
 
-    private List<Contact> contacts;
-    private Context context;
-    private static String sections = "abcdefghijklmnopqrstuvwxyz";
-    private ImageLoaderManager loaderManager;
+    private static final String SECTIONS = "abcdefghijklmnopqrstuvwxyz#";
 
-    public SimpleIndexAdapter(List<Contact> contacts, Context ctx, ImageLoaderManager loaderManager) {
+    private List<Contact> contacts;
+    private List<Contact> contactItems;
+    private Context context;
+    private ImageLoaderManager loaderManager;
+    private QuickConnectListener listener;
+
+    public SimpleIndexAdapter(List<Contact> contacts, Context ctx, ImageLoaderManager loaderManager, QuickConnectListener listener) {
         super(ctx, R.layout.contact_item, contacts);
         this.contacts = contacts;
         this.context = ctx;
         this.loaderManager = loaderManager;
+        this.listener = listener;
+
+        contactItems = new ArrayList<Contact>();
+
+        char currentHeaderLetter = contacts.get(0).name.charAt(0);
+        contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+        for (Contact contact : contacts) {
+            if (contact.name.charAt(0) != currentHeaderLetter) {
+                currentHeaderLetter = contact.name.charAt(0);
+                contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+            }
+            contactItems.add(contact);
+        }
+
     }
 
     public int getCount() {
-        return contacts.size();
+        return contactItems.size();
     }
 
     public Contact getItem(int position) {
-        return contacts.get(position);
+        return contactItems.get(position);
     }
 
     public long getItemId(int position) {
-        return contacts.get(position).hashCode();
+        return contactItems.get(position).hashCode();
     }
 
     @Override
@@ -48,34 +67,63 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.contact_item, null);
-            //v.setBackgroundResource(android.R.color.transparent);
 
             viewHolder = new ViewHolder();
             viewHolder.photo = (ImageView) v.findViewById(R.id.photo);
             viewHolder.name = (TextView) v.findViewById(R.id.name);
             viewHolder.data = (TextView) v.findViewById(R.id.data);
+            viewHolder.listHeaderTitle = (TextView) v.findViewById(R.id.list_header_title);
+            viewHolder.quickConnect = (TextView) v.findViewById(R.id.quick_connect);
+            viewHolder.frame = v.findViewById(R.id.main_frame);
+
             v.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        Contact contact = getItem(position);
-        viewHolder.name.setText(contact.name);
-        viewHolder.data.setText(contact.data);
+        final Contact contact = getItem(position);
 
-        loaderManager.loadContactPhoto(viewHolder.photo, contact);
+        boolean isHeaderItem = contact instanceof ContactItem;
 
+        viewHolder.frame.setVisibility(isHeaderItem ? View.GONE : View.VISIBLE);
+        viewHolder.listHeaderTitle.setVisibility(isHeaderItem ? View.VISIBLE : View.GONE);
+
+        if (isHeaderItem) {
+            viewHolder.listHeaderTitle.setText(contact.name);
+        } else {
+            viewHolder.name.setText(contact.name);
+            viewHolder.data.setText(contact.data);
+            viewHolder.frame.setBackgroundColor(contact.isConnected ? Color.GREEN : Color.WHITE);
+            viewHolder.quickConnect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onQuickConnect(contact.id);
+                }
+            });
+
+            loaderManager.loadContactPhoto(viewHolder.photo, contact);
+            v.setSelected(contact.isConnected);
+        }
         return v;
 
     }
 
     @Override
     public int getPositionForSection(int section) {
-//        Log.d("ListView", "Get position for section: " + section);
         for (int i = 0; i < getCount(); i++) {
-            String item = getItem(i).name.toLowerCase();
-            if (item.charAt(0) == sections.charAt(section)) {
-                Log.d("ListView", "Get position for section: " + sections.charAt(section) + " " +  item);
+
+            Contact contact = getItem(i);
+
+            //if (contact instanceof ContactItem) continue;
+
+            String item = contact.name.toLowerCase();
+
+            if (SECTIONS.charAt(section) == '#' && (item.charAt(0) < 'a' || item.charAt(0) > 'z')) {
+                return i;
+            }
+
+            if (item.charAt(0) == SECTIONS.charAt(section)) {
+                Log.d("ListView", "Get position for section: " + SECTIONS.charAt(section) + " " +  item);
                 return i;
             }
         }
@@ -90,10 +138,11 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
 
     @Override
     public Object[] getSections() {
-        Log.d("ListView", "Get sections");
-        String[] sectionsArr = new String[sections.length()];
-        for (int i = 0; i < sections.length(); i++)
-            sectionsArr[i] = "" + sections.charAt(i);
+        Log.d("ListView", "Get SECTIONS");
+        String[] sectionsArr = new String[SECTIONS.length()];
+        for (int i = 0; i < SECTIONS.length(); i++) {
+            sectionsArr[i] = "" + SECTIONS.charAt(i);
+        }
 
         return sectionsArr;
     }
@@ -103,17 +152,24 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         TextView name;
         TextView data;
         ImageView photo;
+        TextView quickConnect;
+        View frame;
+        TextView listHeaderTitle;
     }
 
     static class Contact implements Comparable<Contact> {
         int id;
+        boolean isConnected;
         String name;
         String lastName;
         String photo;
         String data;
 
-        Contact(int id, String name, String lastName, String photo, String data) {
+        private Contact() {}
+
+        Contact(int id, boolean isConnected, String name, String lastName, String photo, String data) {
             this.id = id;
+            this.isConnected = isConnected;
             this.name = name;
             this.lastName = lastName;
             this.photo = photo;
@@ -137,4 +193,18 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
 
         };
     }
+
+    // can be used as contact item or as contact header
+    static class ContactItem extends Contact {
+
+        ContactItem(String name) {
+            this.name = name;
+        }
+
+    }
+
+    static interface QuickConnectListener {
+        void onQuickConnect(int id);
+    }
+
 }

@@ -9,10 +9,12 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
+import android.widget.Toast;
 
 public class FastSearchListView extends ListView {
 
@@ -27,6 +29,7 @@ public class FastSearchListView extends ListView {
     private String section;
     private boolean showLetter = true;
     private Handler listHandler;
+    private boolean move = false;
 
     public FastSearchListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -45,11 +48,9 @@ public class FastSearchListView extends ListView {
         ctx = context;
 
     }
-
-
+/*
     @Override
     protected void onDraw(Canvas canvas) {
-        try {
         super.onDraw(canvas);
 
         scaledWidth = indWidth * getSizeInPixel(ctx);
@@ -58,6 +59,9 @@ public class FastSearchListView extends ListView {
         Paint p = new Paint();
         p.setColor(Color.WHITE);
         p.setAlpha(255);
+
+        Paint textPaint2 = new Paint();
+        textPaint2.setColor(Color.GREEN);
 
         canvas.drawRect(sx, this.getPaddingTop(), sx + scaledWidth,
                 this.getHeight() - this.getPaddingBottom(), p);
@@ -72,21 +76,43 @@ public class FastSearchListView extends ListView {
         for (int i = 0; i < sections.length; i++)
             canvas.drawText(sections[i].toUpperCase(),
                     sx + textPaint.getTextSize() / 2, getPaddingTop()
+                    + indexSize * (i + 1),
+                    (move && sections[i].equals(section)) ? textPaint2 : textPaint);
+    }
+*/
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+
+        scaledWidth = indWidth * getSizeInPixel(ctx);
+        sx = this.getWidth() - this.getPaddingRight() - scaledWidth;
+
+        Paint p = new Paint();
+        p.setColor(Color.WHITE);
+        p.setAlpha(255);
+
+        Paint textPaint2 = new Paint();
+        textPaint2.setColor(Color.GREEN);
+
+        canvas.drawRect(sx, this.getPaddingTop(), sx + scaledWidth,
+                this.getHeight() - this.getPaddingBottom(), p);
+
+        indexSize = (this.getHeight() - this.getPaddingTop() - getPaddingBottom())
+                / sections.length;
+
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.GREEN);
+        textPaint.setTextSize(scaledWidth / 2);
+
+        for (int i = 0; i < sections.length; i++)
+            canvas.drawText(sections[i].toUpperCase(),
+                    sx + textPaint.getTextSize() / 2, getPaddingTop()
                     + indexSize * (i + 1), textPaint);
 
-        // We draw the letter in the middle
-        if (showLetter & section != null && !section.equals("")) {
-
-            System.out.println(":::::::::  " + section);
-
-            Paint textPaint2 = new Paint();
+        if (showLetter && section != null && !section.equals("")) {
             textPaint2.setColor(Color.GREEN);
             textPaint2.setTextSize(2 * indWidth);
-
             canvas.drawText(section.toUpperCase(), getWidth() / 2, getHeight() / 2, textPaint2);
-        }
-        } catch(Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -118,6 +144,7 @@ public class FastSearchListView extends ListView {
                         section = sections[currentPosition];
                         this.setSelection(((SectionIndexer) getAdapter())
                                 .getPositionForSection(currentPosition));
+                        move = false;
                     } catch (Exception e) {
                     }
                 }
@@ -133,6 +160,8 @@ public class FastSearchListView extends ListView {
                         section = sections[currentPosition];
                         this.setSelection(((SectionIndexer) getAdapter())
                                 .getPositionForSection(currentPosition));
+                        move = true;
+                        showLetter = true;
                     } catch (Exception e) {
 
                     }
@@ -142,10 +171,9 @@ public class FastSearchListView extends ListView {
             }
             case MotionEvent.ACTION_UP: {
                 listHandler = new ListHandler();
-                listHandler.sendEmptyMessageDelayed(0, 3 * 1000);
+                listHandler.sendEmptyMessageDelayed(0, 1000);
+                move = false;
                 return super.onTouchEvent(event);
-
-//                break;
             }
         }
         return true;

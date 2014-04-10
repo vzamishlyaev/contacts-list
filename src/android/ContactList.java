@@ -78,14 +78,18 @@ public class ContactList extends CordovaPlugin {
 
             for (int i = 0; i < len; i++) {
                 JSONObject object = (JSONObject) jsonContacts.get(i);
-                contacts.add(new SimpleIndexAdapter.Contact(object.getInt("id"), object.getString("name"),
-                        object.getString("lastName"), object.getString("photo"), object.getString("data")));
+                contacts.add(new SimpleIndexAdapter.Contact(object.getInt("id"), object.getBoolean("connected"), object.getString("name"),
+                        object.getString("name"), object.getString("photo"), object.getString("data")));
             }
 
             Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
-            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager);
-
+            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager, new SimpleIndexAdapter.QuickConnectListener() {
+                @Override
+                public void onQuickConnect(int id) {
+                    System.out.println("::::::::::  " + id);
+                }
+            });
 			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
