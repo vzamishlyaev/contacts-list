@@ -79,23 +79,28 @@ public class ContactList extends CordovaPlugin {
             for (int i = 0; i < len; i++) {
                 JSONObject object = (JSONObject) jsonContacts.get(i);
                 contacts.add(new SimpleIndexAdapter.Contact(object.getInt("id"), object.getBoolean("connected"), object.getString("name"),
-                        object.getString("name"), object.getString("photo"), object.getString("data")));
+                        object.getString("lastName"), object.getString("photo"), object.getString("data")));
             }
 
             Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
-            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager, new SimpleIndexAdapter.QuickConnectListener() {
+
+            SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, this, loaderManager, new SimpleIndexAdapter.ClickListener() {
                 @Override
-                public void onQuickConnect(int id) {
-                    System.out.println("::::::::::  " + id);
+                public void onQuickConnect(SimpleIndexAdapter.Contact contact) {
+                    System.out.println(":::::::::: onQuickConnect  " + contact.name);
+                }
+
+                @Override
+                public void onIntroduce(SimpleIndexAdapter.Contact contact) {
+                    System.out.println(":::::::::: onIntroduce  " + contact.name);
+                }
+
+                @Override
+                public void onItemClick(SimpleIndexAdapter.Contact contact) {
+                    System.out.println(":::::::::: onItemClick  " + contact.name);
                 }
             });
-			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-					webView.loadUrl(String.format("javascript:contactListTouchCallback('%s');", contacts.get(i).id));
-				}
-			});
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override

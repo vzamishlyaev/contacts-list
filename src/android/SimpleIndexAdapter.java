@@ -1,4 +1,4 @@
-package org.apache.cordova.contactlist;
+package com.example.ls;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,10 +10,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
-import com.qordinate.mobile.R;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact> implements SectionIndexer {
@@ -24,25 +24,46 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
     private List<Contact> contactItems;
     private Context context;
     private ImageLoaderManager loaderManager;
-    private QuickConnectListener listener;
+    private ClickListener listener;
+    private HashMap<Character, Integer> letterPositions;
 
-    public SimpleIndexAdapter(List<Contact> contacts, Context ctx, ImageLoaderManager loaderManager, QuickConnectListener listener) {
+    private int textColorGreen;
+    private int textColorWhite;
+
+    public SimpleIndexAdapter(List<Contact> contacts, Context ctx, ImageLoaderManager loaderManager, ClickListener listener) {
         super(ctx, R.layout.contact_item, contacts);
         this.contacts = contacts;
         this.context = ctx;
         this.loaderManager = loaderManager;
         this.listener = listener;
 
-        contactItems = new ArrayList<Contact>();
+        textColorGreen = Color.parseColor(ctx.getString(R.color.main_green));
+        textColorWhite = Color.parseColor(ctx.getString(R.color.white));
 
-        char currentHeaderLetter = contacts.get(0).name.charAt(0);
+        contactItems = new ArrayList<Contact>();
+        letterPositions = new HashMap<Character, Integer>();
+
+        char currentHeaderLetter = contacts.get(0).lastName.toUpperCase().charAt(0);
+
+        int i = 0;
+
         contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+        letterPositions.put(currentHeaderLetter, i++);
         for (Contact contact : contacts) {
-            if (contact.name.charAt(0) != currentHeaderLetter) {
-                currentHeaderLetter = contact.name.charAt(0);
+            char ch = contact.lastName.toUpperCase().charAt(0);
+
+            if (ch < 'A' || ch > 'Z') {
+                ch = '#';
+            }
+
+            if (ch != currentHeaderLetter) {
+                currentHeaderLetter = ch;
                 contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+                letterPositions.put(currentHeaderLetter, i);
+                i++;
             }
             contactItems.add(contact);
+            i++;
         }
 
     }
@@ -93,41 +114,40 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         } else {
             viewHolder.name.setText(contact.name);
             viewHolder.data.setText(contact.data);
-            viewHolder.frame.setBackgroundColor(contact.isConnected ? Color.GREEN : Color.WHITE);
-            viewHolder.quickConnect.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onQuickConnect(contact.id);
-                }
-            });
+            viewHolder.frame.setBackgroundResource(contact.isConnected ? R.color.light_green : R.color.white);
 
             loaderManager.loadContactPhoto(viewHolder.photo, contact);
             v.setSelected(contact.isConnected);
         }
+
+        viewHolder.quickConnect.setText(contact.isConnected ? R.string.introduce : R.string.quick_connect);
+        viewHolder.quickConnect.setTextColor(contact.isConnected ? textColorGreen : textColorWhite);
+        viewHolder.quickConnect.setBackgroundResource(contact.isConnected ? R.drawable.empty_frame : R.drawable.filled_frame);
+                viewHolder.quickConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (contact.isConnected) {
+                    listener.onIntroduce(contact);
+                } else {
+                    listener.onQuickConnect(contact);
+                }
+            }
+        });
+
+        viewHolder.frame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onItemClick(contact);
+            }
+        });
+
         return v;
 
     }
 
     @Override
     public int getPositionForSection(int section) {
-        for (int i = 0; i < getCount(); i++) {
-
-            Contact contact = getItem(i);
-
-            //if (contact instanceof ContactItem) continue;
-
-            String item = contact.name.toLowerCase();
-
-            if (SECTIONS.charAt(section) == '#' && (item.charAt(0) < 'a' || item.charAt(0) > 'z')) {
-                return i;
-            }
-
-            if (item.charAt(0) == SECTIONS.charAt(section)) {
-                Log.d("ListView", "Get position for section: " + SECTIONS.charAt(section) + " " +  item);
-                return i;
-            }
-        }
-        return 0;
+        return letterPositions.get(Character.toUpperCase(SECTIONS.charAt(section)));
     }
 
     @Override
@@ -188,7 +208,10 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
                 String name1 = contact1.lastName.toUpperCase();
                 String name2 = contact2.lastName.toUpperCase();
 
-                return name1.compareTo(name2);
+                boolean isCh1 = Character.isLetter(name1.charAt(0));
+                boolean isCh2 = Character.isLetter(name2.charAt(0));
+
+                return isCh1 && isCh2 ? name1.compareTo(name2) : isCh1 ? -1 : 1;
             }
 
         };
@@ -203,8 +226,10 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
 
     }
 
-    static interface QuickConnectListener {
-        void onQuickConnect(int id);
+    static interface ClickListener {
+        void onQuickConnect(Contact contact);
+        void onIntroduce(Contact contact);
+        void onItemClick(Contact contact);
     }
 
 }

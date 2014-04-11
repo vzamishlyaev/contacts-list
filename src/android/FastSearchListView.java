@@ -1,4 +1,4 @@
-package org.apache.cordova.contactlist;
+package com.example.ls;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.widget.ListAdapter;
@@ -29,91 +30,57 @@ public class FastSearchListView extends ListView {
     private String section;
     private boolean showLetter = true;
     private Handler listHandler;
-    private boolean move = false;
 
     public FastSearchListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         ctx = context;
-
     }
 
     public FastSearchListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ctx = context;
-
     }
 
     public FastSearchListView(Context context) {
         super(context);
         ctx = context;
-
     }
-/*
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
 
-        scaledWidth = indWidth * getSizeInPixel(ctx);
-        sx = this.getWidth() - this.getPaddingRight() - scaledWidth;
-
-        Paint p = new Paint();
-        p.setColor(Color.WHITE);
-        p.setAlpha(255);
-
-        Paint textPaint2 = new Paint();
-        textPaint2.setColor(Color.GREEN);
-
-        canvas.drawRect(sx, this.getPaddingTop(), sx + scaledWidth,
-                this.getHeight() - this.getPaddingBottom(), p);
-
-        indexSize = (this.getHeight() - this.getPaddingTop() - getPaddingBottom())
-                / sections.length;
-
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.GRAY);
-        textPaint.setTextSize(scaledWidth / 2);
-
-        for (int i = 0; i < sections.length; i++)
-            canvas.drawText(sections[i].toUpperCase(),
-                    sx + textPaint.getTextSize() / 2, getPaddingTop()
-                    + indexSize * (i + 1),
-                    (move && sections[i].equals(section)) ? textPaint2 : textPaint);
-    }
-*/
     @Override
     protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
+        try {
+            scaledWidth = indWidth * getSizeInPixel(ctx);
+            sx = this.getWidth() - this.getPaddingRight() - scaledWidth;
 
-        scaledWidth = indWidth * getSizeInPixel(ctx);
-        sx = this.getWidth() - this.getPaddingRight() - scaledWidth;
+            Paint p = new Paint();
+            p.setColor(Color.WHITE);
+            p.setAlpha(255);
 
-        Paint p = new Paint();
-        p.setColor(Color.WHITE);
-        p.setAlpha(255);
+            Paint textPaint2 = new Paint();
+            textPaint2.setColor(Color.parseColor(getResources().getString(R.color.main_green)));
 
-        Paint textPaint2 = new Paint();
-        textPaint2.setColor(Color.GREEN);
+            canvas.drawRect(sx, this.getPaddingTop(), sx + scaledWidth,
+                    this.getHeight() - this.getPaddingBottom(), p);
 
-        canvas.drawRect(sx, this.getPaddingTop(), sx + scaledWidth,
-                this.getHeight() - this.getPaddingBottom(), p);
+            indexSize = (this.getHeight() - this.getPaddingTop() - getPaddingBottom())
+                    / sections.length;
 
-        indexSize = (this.getHeight() - this.getPaddingTop() - getPaddingBottom())
-                / sections.length;
+            Paint textPaint = new Paint();
+            textPaint.setColor(Color.GREEN);
+            textPaint.setTextSize(scaledWidth / 2);
 
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.GREEN);
-        textPaint.setTextSize(scaledWidth / 2);
+            for (int i = 0; i < sections.length; i++)
+                canvas.drawText(sections[i].toUpperCase(),
+                        sx + textPaint.getTextSize() / 2, getPaddingTop()
+                        + indexSize * (i + 1), textPaint);
 
-        for (int i = 0; i < sections.length; i++)
-            canvas.drawText(sections[i].toUpperCase(),
-                    sx + textPaint.getTextSize() / 2, getPaddingTop()
-                    + indexSize * (i + 1), textPaint);
-
-        if (showLetter && section != null && !section.equals("")) {
-            textPaint2.setColor(Color.GREEN);
-            textPaint2.setTextSize(2 * indWidth);
-            canvas.drawText(section.toUpperCase(), getWidth() / 2, getHeight() / 2, textPaint2);
-        }
+            if (showLetter && section != null && !section.equals("")) {
+                textPaint2.setColor(Color.GREEN);
+                textPaint2.setTextSize(2 * indWidth);
+                canvas.drawText(section.toUpperCase(), getWidth() / 2, getHeight() / 2, textPaint2);
+            }
+        } catch (Exception ignore) {}
     }
 
     private static float getSizeInPixel(Context ctx) {
@@ -144,7 +111,6 @@ public class FastSearchListView extends ListView {
                         section = sections[currentPosition];
                         this.setSelection(((SectionIndexer) getAdapter())
                                 .getPositionForSection(currentPosition));
-                        move = false;
                     } catch (Exception e) {
                     }
                 }
@@ -160,7 +126,6 @@ public class FastSearchListView extends ListView {
                         section = sections[currentPosition];
                         this.setSelection(((SectionIndexer) getAdapter())
                                 .getPositionForSection(currentPosition));
-                        move = true;
                         showLetter = true;
                     } catch (Exception e) {
 
@@ -172,7 +137,6 @@ public class FastSearchListView extends ListView {
             case MotionEvent.ACTION_UP: {
                 listHandler = new ListHandler();
                 listHandler.sendEmptyMessageDelayed(0, 1000);
-                move = false;
                 return super.onTouchEvent(event);
             }
         }

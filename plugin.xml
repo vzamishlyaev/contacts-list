@@ -31,6 +31,11 @@
         <resource-file src="src/android/res/drawable/list_item_selector.xml" target="res/drawable/list_item_selector.xml" />
 	-->
         <resource-file src="src/android/res/layout/contact_item.xml" target="res/layout/contact_item.xml" />
+	<resource-file src="src/android/res/drawable/empty_frame.xml" target="res/drawable/empty_frame.xml" />
+	<resource-file src="src/android/res/drawable/empty.xml" target="res/drawable/empty.xml" />
+	<resource-file src="src/android/res/drawable/filled_frame.xml" target="res/drawable/filled_frame.xml" />
+	<resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
+	<resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml" />
     </platform>
           
 </plugin>

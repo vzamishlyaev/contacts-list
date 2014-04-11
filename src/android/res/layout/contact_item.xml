@@ -14,6 +14,8 @@
         <ImageView
                 android:id="@+id/photo"
                 android:visibility="visible"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="4dp"
                 android:layout_width="32dp"
                 android:layout_height="32dp"/>
 
@@ -27,6 +29,7 @@
             <TextView
                     android:id="@+id/name"
                     android:textSize="15dp"
+                    android:textColor="@color/header_text_grey"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:layout_width="wrap_content"
@@ -35,6 +38,7 @@
             <TextView
                     android:id="@+id/data"
                     android:textSize="10dp"
+                    android:textColor="@color/header_text_grey"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:layout_width="wrap_content"
@@ -45,8 +49,8 @@
         <TextView
                 android:id="@+id/quick_connect"
                 android:textSize="11dp"
+                android:layout_marginRight="2dp"
                 android:layout_gravity="center_vertical"
-                android:text="Quick Connect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -57,9 +61,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:textColor="@color/header_text_grey"
             android:paddingTop="2dip"
             android:paddingBottom="2dip"
-            android:paddingLeft="5dip"
+            android:paddingLeft="12dip"
+            android:background="@color/header_grey"
             style="?android:attr/listSeparatorTextViewStyle"/>
 
 </LinearLayout>

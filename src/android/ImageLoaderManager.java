@@ -1,9 +1,9 @@
-package org.apache.cordova.contactlist;
+package com.example.ls;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.ContactsContract;
@@ -90,6 +90,7 @@ public class ImageLoaderManager extends ThreadPoolExecutor {
                     @Override
                     public void run() {
                         mImageView.setImageBitmap(result);
+                        mImageView.setBackgroundResource(result != null ? android.R.color.transparent : R.drawable.empty);
                     }
                 });
             }
@@ -101,13 +102,43 @@ public class ImageLoaderManager extends ThreadPoolExecutor {
             final Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
             final InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(mContext.getContentResolver(), contactUri);
             Bitmap photo = BitmapFactory.decodeStream(input);
-            return photo;
+
+            if (photo == null) {
+                return null;
+            }
+
+            float density = mContext.getResources().getDisplayMetrics().density;
+
+            int targetWidth = (int) (32 * density);
+            int targetHeight = (int) (32 * density);
+
+            Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+                    targetHeight, Bitmap.Config.ARGB_8888);
+
+
+            Canvas canvas = new Canvas(targetBitmap);
+            Path path = new Path();
+            path.addCircle(
+                    ((float) targetWidth - 1) / 2,
+                    ((float) targetHeight - 1) / 2,
+                    (Math.min(((float) targetWidth), ((float) targetHeight)) / 2),
+                    Path.Direction.CCW);
+
+            canvas.clipPath(path);
+            canvas.drawBitmap(
+                    photo,
+                    new Rect(0, 0, photo.getWidth(), photo
+                            .getHeight()), new Rect(0, 0, targetWidth,
+                    targetHeight), null);
+            return targetBitmap;
+
+            //return photo;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
-
 
     public static interface ImageLoaderTask extends Runnable {
         int getHashCode();
