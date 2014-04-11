@@ -35,7 +35,7 @@
 	<resource-file src="src/android/res/drawable/empty.xml" target="res/drawable/empty.xml" />
 	<resource-file src="src/android/res/drawable/filled_frame.xml" target="res/drawable/filled_frame.xml" />
 	<resource-file src="src/android/res/values/colors.xml" target="res/values/colors.xml" />
-	<resource-file src="src/android/res/values/strings.xml" target="res/values/strings.xml" />
+	<resource-file src="src/android/res/values/strings1.xml" target="res/values/strings1.xml" />
     </platform>
           
 </plugin>
