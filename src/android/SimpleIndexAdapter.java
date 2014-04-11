@@ -1,4 +1,4 @@
-package com.example.ls;
+package org.apache.cordova.contactlist;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
+import com.qordinate.mobile.R;
 
 public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact> implements SectionIndexer {
 

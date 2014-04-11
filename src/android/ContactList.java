@@ -85,7 +85,7 @@ public class ContactList extends CordovaPlugin {
             Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
 
-            SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, this, loaderManager, new SimpleIndexAdapter.ClickListener() {
+            final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager, new SimpleIndexAdapter.ClickListener() {
                 @Override
                 public void onQuickConnect(SimpleIndexAdapter.Contact contact) {
                     System.out.println(":::::::::: onQuickConnect  " + contact.name);

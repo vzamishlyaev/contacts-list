@@ -1,4 +1,4 @@
-package com.example.ls;
+package org.apache.cordova.contactlist;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.*;
+
+import com.qordinate.mobile.R;
 
 public class ImageLoaderManager extends ThreadPoolExecutor {
 

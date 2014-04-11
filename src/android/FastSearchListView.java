@@ -1,4 +1,4 @@
-package com.example.ls;
+package org.apache.cordova.contactlist;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -16,6 +16,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.Toast;
+
+import com.qordinate.mobile.R;
 
 public class FastSearchListView extends ListView {
 
