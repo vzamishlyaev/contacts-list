@@ -89,19 +89,19 @@ public class ContactList extends CordovaPlugin {
                 @Override
                 public void onQuickConnect(SimpleIndexAdapter.Contact contact) {
                     System.out.println(":::::::::: onQuickConnect  " + contact.name);
-                    webView.loadUrl(String.format("javascript:onQuickConnect(%s)", contact.id));
+                    webView.loadUrl(String.format("javascript:onQuickConnect(%s, %s)", contact.id, contact.isConnected));
                 }
 
                 @Override
                 public void onIntroduce(SimpleIndexAdapter.Contact contact) {
                     System.out.println(":::::::::: onIntroduce  " + contact.name);
-                    webView.loadUrl(String.format("javascript:onIntroduce(%s)", contact.id));
+                    webView.loadUrl(String.format("javascript:onIntroduce(%s, %s)", contact.id, contact.isConnected));
                 }
 
                 @Override
                 public void onItemClick(SimpleIndexAdapter.Contact contact) {
                     System.out.println(":::::::::: onItemClick  " + contact.name);
-                    webView.loadUrl(String.format("javascript:onItemClick(%s)", contact.id));
+                    webView.loadUrl(String.format("javascript:onItemClick(%s, %s)", contact.id, contact.isConnected));
                 }
             });
 
@@ -126,4 +126,5 @@ public class ContactList extends CordovaPlugin {
 
 
 }
+
 
