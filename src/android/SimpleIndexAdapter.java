@@ -45,29 +45,30 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         contactItems = new ArrayList<Contact>();
         letterPositions = new HashMap<Character, Integer>();
 
-        char currentHeaderLetter = contacts.get(0).lastName.toUpperCase().charAt(0);
+		if(contacts.size() != 0){
+			char currentHeaderLetter = contacts.get(0).lastName.toUpperCase().charAt(0);
 
-        int i = 0;
+			int i = 0;
 
-        contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
-        letterPositions.put(currentHeaderLetter, i++);
-        for (Contact contact : contacts) {
-            char ch = contact.lastName.toUpperCase().charAt(0);
+			contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+			letterPositions.put(currentHeaderLetter, i++);
+			for (Contact contact : contacts) {
+				char ch = contact.lastName.toUpperCase().charAt(0);
 
-            if (ch < 'A' || ch > 'Z') {
-                ch = '#';
-            }
+				if (ch < 'A' || ch > 'Z') {
+					ch = '#';
+				}
 
-            if (ch != currentHeaderLetter) {
-                currentHeaderLetter = ch;
-                contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
-                letterPositions.put(currentHeaderLetter, i);
-                i++;
-            }
-            contactItems.add(contact);
-            i++;
-        }
-
+				if (ch != currentHeaderLetter) {
+					currentHeaderLetter = ch;
+					contactItems.add(new ContactItem(String.valueOf(currentHeaderLetter)));
+					letterPositions.put(currentHeaderLetter, i);
+					i++;
+				}
+				contactItems.add(contact);
+				i++;
+			}
+		}
     }
 
     public int getCount() {
@@ -235,3 +236,4 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
     }
 
 }
+
