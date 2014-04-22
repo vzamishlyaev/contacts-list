@@ -18,21 +18,22 @@ import java.util.Collections;
 import java.util.List;
 import android.view.View;
 import android.widget.*;
+import android.view.*;
 
 public class ContactList extends CordovaPlugin {
 
     private FastSearchListView listView;
     private ImageLoaderManager loaderManager;
+    private int webViewHeight;
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("addContactList")) {
 
-
-            int height = args.getInt(0);
+            final int height = args.getInt(0);
 
             listView = new FastSearchListView(cordova.getActivity());
-            listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-            //listView.setFastScrollEnabled(true);
+
+            listView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
             listView.setBackgroundResource(android.R.color.white);
             listView.setCacheColorHint(android.R.color.transparent);
             listView.setScrollingCacheEnabled(false);
@@ -41,6 +42,8 @@ public class ContactList extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    webViewHeight = webView.getLayoutParams().height;
+                    webView.getLayoutParams().height = height;
             		loaderManager = new ImageLoaderManager(new Handler(), cordova.getActivity());
                     getParentView().addView(listView, 1);
                 }
@@ -52,6 +55,7 @@ public class ContactList extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    webView.getLayoutParams().height = webViewHeight;
                     getParentView().removeView(listView);
                 }
             });
