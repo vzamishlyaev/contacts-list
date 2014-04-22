@@ -82,7 +82,7 @@ public class ContactList extends CordovaPlugin {
                         object.getString("lastName"), object.getString("photo"), object.getString("data")));
             }
 
-            Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
+            //Collections.sort(contacts, SimpleIndexAdapter.Contact.lastNameComparator);
 
 
             final SimpleIndexAdapter sa = new SimpleIndexAdapter(contacts, cordova.getActivity(), loaderManager, new SimpleIndexAdapter.ClickListener() {
@@ -120,11 +120,37 @@ public class ContactList extends CordovaPlugin {
         return false;
     }
 
+    public void sort(List<SimpleIndexAdapter.Contact> l) {
+        for (int sz = l.size(), i = 1; i < sz; i++) {
+            int j = i;
+            while (j > 0) {
+                SimpleIndexAdapter.Contact prev = l.get(j - 1);
+                SimpleIndexAdapter.Contact thisOne = l.get( j );
+                if (compare(prev, thisOne)) {
+                    l.set(j - 1, thisOne);
+                    l.set(j, prev);
+                } else {
+                    break;
+                }
+                j--;
+            }
+        }
+    }
+
+    private boolean compare(SimpleIndexAdapter.Contact contact1, SimpleIndexAdapter.Contact contact2) {
+        String name1 = contact1.lastName.toUpperCase();
+        String name2 = contact2.lastName.toUpperCase();
+
+        boolean isCh1 = Character.isLetter(name1.charAt(0));
+        boolean isCh2 = Character.isLetter(name2.charAt(0));
+
+       return isCh1 && isCh2 ? name1.compareTo(name2) > 0 : !isCh1;
+    }
+
     private LinearLayoutSoftKeyboardDetect getParentView() {
         return (LinearLayoutSoftKeyboardDetect) webView.getParent();
     }
 
 
 }
-
 

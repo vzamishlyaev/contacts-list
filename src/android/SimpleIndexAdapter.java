@@ -192,11 +192,19 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
 
         Contact(int id, boolean isConnected, String name, String lastName, String photo, String data) {
             this.id = id;
-            this.isConnected = isConnected;
-            this.name = name;
-            this.lastName = lastName;
-            this.photo = photo;
-            this.data = data;
+			this.isConnected = isConnected;
+			this.name = name;
+			this.lastName = lastName;
+			this.photo = photo;
+			this.data = data;
+
+			if (this.lastName.length() == 0) {
+				this.lastName = " ";
+			}
+
+			if (this.name.length() == 0) {
+				this.name = " ";
+			}
         }
 
         public int compareTo(Contact contact) {
@@ -204,20 +212,22 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
             return lastName.compareTo(lastName);
         }
 
-        public static Comparator<Contact> lastNameComparator = new Comparator<Contact>() {
+         public static Comparator<Contact> lastNameComparator = new Comparator<Contact>() {
+			public int compare(Contact contact1, Contact contact2) {
 
-            public int compare(Contact contact1, Contact contact2) {
+				String name1 = contact1.lastName.toUpperCase();
+				String name2 = contact2.lastName.toUpperCase();
 
-                String name1 = contact1.lastName.toUpperCase();
-                String name2 = contact2.lastName.toUpperCase();
+				int ch1 = name1.charAt(0);
+				int ch2 = name2.charAt(0);
 
-                boolean isCh1 = Character.isLetter(name1.charAt(0));
-                boolean isCh2 = Character.isLetter(name2.charAt(0));
+				boolean isCh1 = Character.isLetter(ch1);
+				boolean isCh2 = Character.isLetter(ch2);
 
-                return isCh1 && isCh2 ? name1.compareTo(name2) : isCh1 ? -1 : 1;
-            }
+				return (isCh1 && isCh2) ? name1.compareTo(name2) : ch2 - ch1;
+			}
 
-        };
+		};
     }
 
     // can be used as contact item or as contact header
@@ -235,5 +245,31 @@ public class SimpleIndexAdapter extends ArrayAdapter<SimpleIndexAdapter.Contact>
         void onItemClick(Contact contact);
     }
 
-}
+	public void sort(List<SimpleIndexAdapter.Contact> l) {
+		for (int sz = l.size(), i = 1; i < sz; i++) {
+			int j = i;
+			while (j > 0) {
+				SimpleIndexAdapter.Contact prev = l.get(j - 1);
+				SimpleIndexAdapter.Contact thisOne = l.get( j );
+				if (compare(prev, thisOne)) {
+					l.set(j - 1, thisOne);
+					l.set(j, prev);
+				} else {
+					break;
+				}
+				j--;
+			}
+		}
+	}
 
+	private boolean compare(SimpleIndexAdapter.Contact contact1, SimpleIndexAdapter.Contact contact2) {
+		String name1 = contact1.lastName.toUpperCase();
+		String name2 = contact2.lastName.toUpperCase();
+
+		boolean isCh1 = Character.isLetter(name1.charAt(0));
+		boolean isCh2 = Character.isLetter(name2.charAt(0));
+
+	   return isCh1 && isCh2 ? name1.compareTo(name2) > 0 : !isCh1;
+	}
+
+}
